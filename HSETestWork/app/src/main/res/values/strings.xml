@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">HSE Test Work</string>
+    <string name="selected_item">Selected item:</string>
+    <string-array name="currencies">
+        <item>RUB</item>
+        <item>USD</item>
+    </string-array>
 </resources>
