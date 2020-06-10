@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -19,7 +18,7 @@ import java.net.URL
 class EqualException() : Exception() // Если элементы spinner-ов совпадают при конвертации
 class FormatException() : Exception() // Если при конвертации пустое поле ввода
 
-
+// Проверка подключения к сети Интернет
 object NetworkManager {
     fun isNetworkAvailable(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -28,18 +27,15 @@ object NetworkManager {
     }
 }
 class MainActivity : AppCompatActivity() {
-    var From : String = "RUB"
-    var To: String = "USD"
-    var Current: Double = 0.0
+    var From : String = "RUB"  // Из какой валюты переводим
+    var To: String = "USD" // В какую валюту переводим
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        progressBar.setVisibility(View.GONE)
-        // access the items of the list
-        val currencies = resources.getStringArray(R.array.currencies)
+        val currencies = resources.getStringArray(R.array.currencies) // Список валют
 
-        // access the spinner
+        // Первый спиннер (из какой валюты переводим)
         val spinner = findViewById<Spinner>(R.id.spinner)
         if (spinner != null) {
             val adapter = ArrayAdapter(
@@ -53,13 +49,12 @@ class MainActivity : AppCompatActivity() {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                     From = currencies[position]
                 }
-
                 override fun onNothingSelected(parent: AdapterView<*>) {
-                    // write code to perform some action
                 }
             }
         }
 
+        // Второй спиннер (в какую валюту переводим)
         val spinner2 = findViewById<Spinner>(R.id.spinner2)
         if (spinner2 != null) {
             val adapter = ArrayAdapter(
@@ -75,14 +70,14 @@ class MainActivity : AppCompatActivity() {
                     To = currencies[position]
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {
-                    // write code to perform some action
                 }
             }
         }
     }
 
+    // AsyncTask для работы с API курсов валют
     inner class doAsync() : AsyncTask<Double, Void, Double>() {
-        lateinit var pd : ProgressDialog //= ProgressDialog(this@MainActivity)
+        lateinit var pd : ProgressDialog
 
         override fun doInBackground(vararg params: Double?) : Double? {
             var coef : Double = 0.0
@@ -94,7 +89,6 @@ class MainActivity : AppCompatActivity() {
             for (el in r) {
                 if (To in el) coef = el.split(':')[1].toDouble()
             }
-            Log.v("IN", "Cur=$Current; From=$From; To=$To")
             return coef
         }
 
@@ -102,56 +96,44 @@ class MainActivity : AppCompatActivity() {
             super.onPreExecute()
             pd=ProgressDialog.show(this@MainActivity, "", "Checking...", true,
                 false);
-           //progressBar.setVisibility(View.VISIBLE);
-           // getWindow().setFlags(
-            //    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            //    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         }
 
         override fun onPostExecute(result: Double?) {
             super.onPostExecute(result)
             pd.dismiss()
-            //progressBar.setVisibility(View.GONE);
-            //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            //Current = result
-        }
-
-        override fun onProgressUpdate(vararg values: Void?) {
-            super.onProgressUpdate(*values)
         }
     }
 
+    // Обработка одного из исключений
+    fun catchError(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
+        toast.show()
+        Res.setText("")
+        textView4.setText("")
+    }
 
+    // Обработка нажатия на кнопку "Convert!"
     fun convert(view: View) {
         try {
             if (NetworkManager.isNetworkAvailable(this@MainActivity))
             {
-            val from = editTextNumber.text.toString()
-            if (from == "") throw FormatException()
-            if (From == To) throw EqualException()
-            //Log.v("BEFORE", "Cur=$Current; From=$From; To=$To")
-            val my_object = doAsync()
-            my_object.execute()
-            val r = my_object.get()
-            //Log.v("AFTER", "Cur=$Current; From=$From; To=$To r=$r")
-            val res = from.toDouble() * r
-            textView4.setText("Курс: 1 $From = $r $To")
-            Res.setText(String.format("%.2f", res))
+                val from = editTextNumber.text.toString()
+                if (from == "") throw FormatException() // Пытаемся перевести пустое поле
+                if (From == To) throw EqualException() // Валюты перевода совпадают
+                val my_object = doAsync()
+                my_object.execute()
+                val r = my_object.get()  // Результат обращения к API
+                val res = from.toDouble() * r
+                textView4.setText("Курс: 1 $From = ${String.format("%.3f", r)} $To")
+                Res.setText(String.format("%.3f", res))
             }
-            else {
-                Toast.makeText(this@MainActivity, "Проверьте подключение к сети Интернет!", Toast.LENGTH_SHORT).show()
-            }
-
+            else Toast.makeText(this@MainActivity, "Проверьте подключение к сети Интернет!", Toast.LENGTH_SHORT).show()
         }
         catch (e: FormatException) {
-            val toast = Toast.makeText(this, "Ошибка: пустое поле ввода", Toast.LENGTH_SHORT)
-            toast.show()
-            Res.setText("")
+            catchError("Ошибка: пустое поле ввода")
         }
         catch (e: EqualException) {
-            val toast = Toast.makeText(this, "Ошибка: одинаковые валюты", Toast.LENGTH_SHORT)
-            toast.show()
-            Res.setText("")
+            catchError("Ошибка: одинаковые валюты")
         }
 
     }

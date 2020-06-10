@@ -1,8 +1,25 @@
 <resources>
-    <string name="app_name">HSE Test Work</string>
-    <string name="selected_item">Selected item:</string>
+    <string name="app_name">Конвертация курсов валют</string>
     <string-array name="currencies">
         <item>RUB</item>
         <item>USD</item>
+        <item>HRK</item>
+        <item>JPY</item>
+        <item>THB</item>
+        <item>CHF</item>
+        <item>EUR</item>
+        <item>MYR</item>
+        <item>BGN</item>
+        <item>TRY</item>
+        <item>CNY</item>
+        <item>NOK</item>
+        <item>NZD</item>
+        <item>ZAR</item>
+        <item>MXN</item>
+        <item>SGD</item>
+        <item>AUD</item>
+        <item>ILS</item>
+        <item>KRW</item>
+        <item>PLN</item>
     </string-array>
 </resources>
