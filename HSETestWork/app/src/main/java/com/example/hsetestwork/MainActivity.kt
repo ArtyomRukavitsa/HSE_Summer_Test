@@ -81,10 +81,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg params: Double?) : Double? {
             var coef : Double = 0.0
-            val result = URL("https://api.exchangeratesapi.io/latest?base=$From").readText()
-            var str = result.replace("{\"rates\":{", "")
+            val result = URL("https://api.exchangeratesapi.io/latest?base=$From").readText() // Обратились к API
+            var str = result.replace("{\"rates\":{", "") // Убираю ненужные символы
             str = str.replace("}", "")
-            val r = str.split(',')
+            val r = str.split(',') // Массив формата Валюта:Значение
 
             for (el in r) {
                 if (To in el) coef = el.split(':')[1].toDouble()
@@ -106,8 +106,7 @@ class MainActivity : AppCompatActivity() {
 
     // Обработка одного из исключений
     fun catchError(message: String) {
-        val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
-        toast.show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         Res.setText("")
         textView4.setText("")
     }
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         try {
             if (NetworkManager.isNetworkAvailable(this@MainActivity))
             {
-                val from = editTextNumber.text.toString()
+                val from = editTextNumberDecimal.text.toString()
                 if (from == "") throw FormatException() // Пытаемся перевести пустое поле
                 if (From == To) throw EqualException() // Валюты перевода совпадают
                 val my_object = doAsync()

@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Конвертация курсов валют</string>
+    <string name="from">Из:</string>
+    <string name="to">В:</string>
+    <string name="enter_sum">Введите сумму</string>
+    <string name="result">Результат конвертации</string>
+    <string name="convert">Convert!</string>
     <string-array name="currencies">
         <item>RUB</item>
         <item>USD</item>
