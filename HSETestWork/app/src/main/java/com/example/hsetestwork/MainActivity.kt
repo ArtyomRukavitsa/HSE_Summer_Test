@@ -27,8 +27,8 @@ object NetworkManager {
     }
 }
 class MainActivity : AppCompatActivity() {
-    var From : String = "RUB"  // Из какой валюты переводим
-    var To: String = "USD" // В какую валюту переводим
+    var From : String = "RUB"  // Из какой валюты переводим (дефлтное значение - рубль)
+    var To: String = "USD" // В какую валюту переводим (дефолтное значение - доллар)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             spinner.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    From = currencies[position]
+                    From = currencies[position]  // Выбрали валюту, из которой переводим
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {
                 }
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             spinner2.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    To = currencies[position]
+                    To = currencies[position]  // Выбрали валюту, в которую переводим
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {
                 }
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             var coef : Double = 0.0
             val result = URL("https://api.exchangeratesapi.io/latest?base=$From").readText() // Обратились к API
             var str = result.replace("{\"rates\":{", "") // Убираю ненужные символы
-            str = str.replace("}", "")
+            str = str.replace("}", "") // Убираю ненужные символы
             val r = str.split(',') // Массив формата Валюта:Значение
 
             for (el in r) {
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPreExecute() {
             super.onPreExecute()
-            pd=ProgressDialog.show(this@MainActivity, "", "Checking...", true,
+            pd=ProgressDialog.show(this@MainActivity, "Please, wait", "Loading...", true,
                 false);
         }
 
@@ -105,10 +105,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Обработка одного из исключений
-    fun catchError(message: String) {
+    private fun catchError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         Res.setText("")
-        textView4.setText("")
+        textView4.text = ""
     }
 
     // Обработка нажатия на кнопку "Convert!"
@@ -119,11 +119,12 @@ class MainActivity : AppCompatActivity() {
                 val from = editTextNumberDecimal.text.toString()
                 if (from == "") throw FormatException() // Пытаемся перевести пустое поле
                 if (From == To) throw EqualException() // Валюты перевода совпадают
-                val my_object = doAsync()
-                my_object.execute()
-                val r = my_object.get()  // Результат обращения к API
+                val myObject = doAsync()
+                myObject.execute()
+                val r = myObject.get()  // Результат обращения к API
                 val res = from.toDouble() * r
-                textView4.setText("Курс: 1 $From = ${String.format("%.3f", r)} $To")
+                textView4.text = String.format(resources.getString(R.string.rate),
+                    From, String.format("%.3f", r), To);
                 Res.setText(String.format("%.3f", res))
             }
             else Toast.makeText(this@MainActivity, "Проверьте подключение к сети Интернет!", Toast.LENGTH_SHORT).show()

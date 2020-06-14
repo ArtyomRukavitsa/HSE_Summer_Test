@@ -27,7 +27,7 @@
         android:text="@string/enter_sum"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/editTextNumberDecimal"
-        app:layout_constraintHorizontal_bias="0.464"
+        app:layout_constraintHorizontal_bias="0.375"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.415" />
@@ -110,8 +110,9 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="287dp"
-        android:layout_height="36dp"
+        android:gravity="center"
+        android:layout_width="326dp"
+        android:layout_height="48dp"
         android:textColor="#F8302D2D"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
